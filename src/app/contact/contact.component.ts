@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Contact } from './contact.model';
 import { Http } from '@angular/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'contact',
@@ -9,45 +10,51 @@ import { Http } from '@angular/http';
 })
 export class ContactComponent implements OnInit {
 
-  contacts: Array<Contact> = [];
+  movies: Array<Contact> = [];
   contactParams = '';
-  constructor(private http: Http) { }
+  apiURL = '';
+  apiKey = '';
+  constructor(private http: Http) {
+
+    this.apiURL = environment.apiURL;
+   }
+
 
   async ngOnInit() {
-    this.loadContacts();
+    this.loadMovies();
   }
-  async loadContacts() {
-    const savedContacts = this.getItemsFromLocalStorage('contacts');
-    if (savedContacts && savedContacts.length > 0) {
-      this.contacts = savedContacts;
+  async loadMovies() {
+    const savedMovies = this.getItemsFromLocalStorage('contacts');
+    if (savedMovies && savedMovies.length > 0) {
+      this.movies = savedMovies;
     } else {
-      this.contacts = await this.loadItemsFromFile();
+      this.movies = await this.loadItemsFromFile();
     }
-    this.sortByID(this.contacts);
+    this.sortByID(this.movies);
   }
   async loadItemsFromFile() {
     const data = await this.http.get('assets/contacts.json').toPromise();
     return data.json();
   }
 
-  addContact() {
-    this.contacts.unshift(new Contact({}));
+  addMovies() {
+    this.movies.unshift(new Contact({}));
   }
 
-  deleteContact(index: number) {
-    this.contacts.splice(index, 1);
-    this.saveItemsToLocalStorage(this.contacts);
+  deleteMovies(index: number) {
+    this.movies.splice(index, 1);
+    this.saveItemsToLocalStorage(this.movies);
   }
 
-  saveContact(contact: any) {
+  saveMovies(contact: any) {
     contact.editing = false;
-    this.saveItemsToLocalStorage(this.contacts);
+    this.saveItemsToLocalStorage(this.movies);
   }
 
-  saveItemsToLocalStorage(contacts: Array<Contact>) {
-    contacts = this.sortByID(contacts);
-    const savedContacts = localStorage.setItem('contacts', JSON.stringify(contacts));
-    return savedContacts;
+  saveItemsToLocalStorage(movies: Array<Contact>) {
+    movies = this.sortByID(movies);
+    const savedMovies = localStorage.setItem('contacts', JSON.stringify(movies));
+    return savedMovies;
   }
 
   getItemsFromLocalStorage(key: string) {
@@ -55,8 +62,8 @@ export class ContactComponent implements OnInit {
     return savedContacts;
   }
 
-  searchContact(params: string) {
-    this.contacts = this.contacts.filter((item: Contact) => {
+  searchMovies(params: string) {
+    this.movies = this.movies.filter((item: Contact) => {
       const fullName = item.firstName + ' ' + item.lastName;
 
       if (params === fullName || params === item.firstName || params === item.lastName) {
